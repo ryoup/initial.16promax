@@ -28,7 +28,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
 
             // 各 x 座標に対して初期値を設定（最小値を探すので初期値は画像高さより大きい値）
             xCoords.forEach(x => {
-                minYForX[x] = img.height; // 初期値として画像の高さをセット
+                minYForX[x] = null; // 初期値は null（条件を満たすピクセルがないことを判定するため）
             });
 
             // 条件を満たすピクセルを探索
@@ -40,9 +40,13 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
                     const g = data[index + 1]; // 緑
                     const b = data[index + 2]; // 青
 
-                    // 条件: R >= 200, G <= 100, B <= 100
+                    // 条件: R >= 250, G <= 100, B <= 100
                     if (r >= 200 && g <= 100 && b <= 100) {
-                        minYForX[x] = Math.min(minYForX[x], y); // yの最小値を更新
+                        if (minYForX[x] === null) {
+                            minYForX[x] = y; // 初回値
+                        } else {
+                            minYForX[x] = Math.min(minYForX[x], y); // 最小値を更新
+                        }
                     }
                 }
             }
@@ -50,10 +54,10 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             // 結果を表示
             const resultDiv = document.getElementById("result");
             resultDiv.innerHTML = `
-                <p>1PのときのY: ${minYForX[218] === img.height ? "条件を満たすピクセルなし" : minYForX[218]}</p>
-                <p>2PのときのY: ${minYForX[435] === img.height ? "条件を満たすピクセルなし" : minYForX[435]}</p>
-                <p>3PのときのY: ${minYForX[651] === img.height ? "条件を満たすピクセルなし" : minYForX[651]}</p>
-                <p>4PのときのY: ${minYForX[867] === img.height ? "条件を満たすピクセルなし" : minYForX[867]}</p>
+                <p>217のときの最小Y: ${minYForX[217] === null ? "条件を満たすピクセルなし" : minYForX[217]}</p>
+                <p>434のときの最小Y: ${minYForX[434] === null ? "条件を満たすピクセルなし" : minYForX[434]}</p>
+                <p>650のときの最小Y: ${minYForX[650] === null ? "条件を満たすピクセルなし" : minYForX[650]}</p>
+                <p>866のときの最小Y: ${minYForX[866] === null ? "条件を満たすピクセルなし" : minYForX[866]}</p>
             `;
         };
 
