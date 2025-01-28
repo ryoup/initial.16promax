@@ -41,8 +41,8 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
                     const g = data[index + 1]; // 緑
                     const b = data[index + 2]; // 青
 
-                    // 条件: R >= 250, G <= 100, B <= 100
-                    if (r >= 250 && g <= 100 && b <= 100) {
+                    // 条件: R >= 200, G <= 100, B <= 100
+                    if (r >= 200 && g <= 100 && b <= 100) {
                         maxYForX[x] = Math.max(maxYForX[x], y); // yの最大値を更新
                     }
                 }
