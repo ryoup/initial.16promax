@@ -51,10 +51,10 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             // 結果を表示
             const resultDiv = document.getElementById("result");
             resultDiv.innerHTML = `
-                <p>217のときの最大Y: ${maxYForX[217]}</p>
-                <p>434のときの最大Y: ${maxYForX[434]}</p>
-                <p>650のときの最大Y: ${maxYForX[650]}</p>
-                <p>866のときの最大Y: ${maxYForX[866]}</p>
+                <p>217のときの最大Y: ${maxYForX[218]}</p>
+                <p>434のときの最大Y: ${maxYForX[435]}</p>
+                <p>650のときの最大Y: ${maxYForX[651]}</p>
+                <p>866のときの最大Y: ${maxYForX[867]}</p>
             `;
         };
 
