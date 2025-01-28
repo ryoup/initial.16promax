@@ -1,5 +1,6 @@
 document.getElementById("uploadForm").addEventListener("submit", function(e) {
     e.preventDefault(); // ページリロードを防止
+
     const fileInput = document.getElementById("fileInput");
     if (fileInput.files.length === 0) {
         alert("画像を選択してください！");
@@ -8,14 +9,57 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
 
     const file = fileInput.files[0];
     const reader = new FileReader();
+
     reader.onload = function() {
-        // 簡単な画像解析（画像の幅と高さを表示）
         const img = new Image();
         img.onload = function() {
-            document.getElementById("result").innerText = 
-                `画像の幅: ${img.width}px, 高さ: ${img.height}px`;
+            // 画像解析処理
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+
+            // ピクセルデータを取得
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            const data = imageData.data;
+
+            // x座標リスト
+            const xCoords = [217, 434, 650, 866];
+            const maxYForX = {};
+
+            xCoords.forEach(x => {
+                maxYForX[x] = -1; // 初期値
+            });
+
+            // 条件を満たすピクセルを探索
+            for (let y = 0; y < img.height; y++) {
+                for (let x of xCoords) {
+                    const index = (y * img.width + x) * 4; // ピクセルインデックス
+                    const r = data[index];     // 赤
+                    const g = data[index + 1]; // 緑
+                    const b = data[index + 2]; // 青
+
+                    // 条件: R >= 250, G <= 100, B <= 100
+                    if (r >= 250 && g <= 100 && b <= 100) {
+                        maxYForX[x] = Math.max(maxYForX[x], y); // yの最大値を更新
+                    }
+                }
+            }
+
+            // 結果を表示
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+                <p>217のときの最大Y: ${maxYForX[217]}</p>
+                <p>434のときの最大Y: ${maxYForX[434]}</p>
+                <p>650のときの最大Y: ${maxYForX[650]}</p>
+                <p>866のときの最大Y: ${maxYForX[866]}</p>
+            `;
         };
+
         img.src = reader.result;
     };
+
     reader.readAsDataURL(file);
 });
