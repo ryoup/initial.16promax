@@ -23,7 +23,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             const imageData = ctx.getImageData(0, 0, img.width, img.height);
             const data = imageData.data;
 
-            const xCoords = [217, 434, 650, 866];
+            const xCoords = [218, 435, 651, 867];
             const minYForX = {};
 
             // 各 x 座標に対して初期値を設定（最小値を探すので初期値は画像高さより大きい値）
@@ -54,10 +54,10 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             // 結果を表示
             const resultDiv = document.getElementById("result");
             resultDiv.innerHTML = `
-                <p>217のときの最小Y: ${minYForX[217] === null ? "条件を満たすピクセルなし" : minYForX[217]}</p>
-                <p>434のときの最小Y: ${minYForX[434] === null ? "条件を満たすピクセルなし" : minYForX[434]}</p>
-                <p>650のときの最小Y: ${minYForX[650] === null ? "条件を満たすピクセルなし" : minYForX[650]}</p>
-                <p>866のときの最小Y: ${minYForX[866] === null ? "条件を満たすピクセルなし" : minYForX[866]}</p>
+                <p>1PのY: ${minYForX[218] === null ? "条件を満たすピクセルなし" : minYForX[218]}</p>
+                <p>2PのY: ${minYForX[435] === null ? "条件を満たすピクセルなし" : minYForX[435]}</p>
+                <p>3PのY: ${minYForX[651] === null ? "条件を満たすピクセルなし" : minYForX[651]}</p>
+                <p>4PのY: ${minYForX[867] === null ? "条件を満たすピクセルなし" : minYForX[867]}</p>
             `;
         };
 
