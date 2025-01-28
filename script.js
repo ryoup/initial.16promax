@@ -32,7 +32,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             });
 
             // 条件を満たすピクセルを探索
-            for (let y = 0; y < img.height; y++) {
+            for (let y = 1300; y <= 1600; y++) { // Yの範囲を1300～1600に限定
                 for (let x of xCoords) {
                     if (x >= img.width) continue; // x座標が画像幅を超える場合スキップ
                     const index = (y * img.width + x) * 4;
@@ -40,7 +40,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
                     const g = data[index + 1]; // 緑
                     const b = data[index + 2]; // 青
 
-                    // 条件: R >= 250, G <= 100, B <= 100
+                    // 条件: R >= 200, G <= 100, B <= 100
                     if (r >= 200 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
                             minYForX[x] = y; // 初回値
