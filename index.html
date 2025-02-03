@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>画像アップロードサイトc</h1>
+    <h1>画像アップロードサイト</h1>
     <form id="uploadForm">
-        <input type="file" id="fileInput" accept="image/*">
-        <button type="submit">アップロード</button>
+        <label for="fileInput">画像を選択（複数可）:</label>
+        <input type="file" id="fileInput" accept="image/*" multiple>
+        <button type="submit">解析開始</button>
     </form>
     <div id="result"></div>
     <script src="script.js"></script>
