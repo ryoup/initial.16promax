@@ -12,6 +12,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
         .then(response => response.text())
         .then(csvText => {
             const conversionTable = parseCSV(csvText);
+            console.log("🔍 データリストの内容:", conversionTable); // デバッグ用
             processImage(conversionTable); // 画像解析と変換処理を実行
         })
         .catch(error => {
@@ -69,6 +70,7 @@ function processImage(conversionTable) {
                 minYForX[x] = null;
             });
 
+            // 条件1の解析
             for (let y = 1650; y < newHeight; y++) {
                 let meetsCondition = true;
                 for (let x of xCoords) {
@@ -92,6 +94,7 @@ function processImage(conversionTable) {
                 }
             }
 
+            // 条件2の解析
             for (let y = 1300; y < newHeight; y++) {
                 for (let x of xTargets) {
                     if (x >= newWidth) continue;
@@ -109,16 +112,22 @@ function processImage(conversionTable) {
                 }
             }
 
+            // デバッグ: minYForXの内容を表示
+            console.log("🔍 各x座標の最小Y値:", minYForX);
+
             let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
             resultsHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
 
             xTargets.forEach(x => {
                 const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
+                console.log(`x=${x} の元のY値:`, yValue); // デバッグ用
+
                 const convertedY = conversionTable[minYForX[x]] || "該当なし";
+                console.log(`x=${x} の変換後のY値:`, convertedY); // デバッグ用
+
                 const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : "計算不可";
                 resultsHTML += `<p>x=${x} の最小Y: ${yValue}（変換後: ${convertedY}）</p>`;
                 resultsHTML += `<p>Yの引き算 (minCommonY - minYForX[${x}]): ${diff}</p>`;
-                
             });
 
             document.getElementById("result").innerHTML = resultsHTML;
