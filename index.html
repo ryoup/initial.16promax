@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel6限定</title>
+    <title>チェッカー</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>判別サイト（Pixel6）</h1>
+    <h1>画像アップロードサイト</h1>
     <form id="uploadForm">
-        <label for="fileInput">画像を選択:</label>
-        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput">画像を選択（複数可）:</label>
+        <input type="file" id="fileInput" accept="image/*" multiple>
         <button type="submit">解析開始</button>
     </form>
     <div id="result"></div>
