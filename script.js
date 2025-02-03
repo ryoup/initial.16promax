@@ -89,38 +89,11 @@ function processImage(file, conversionTable, callback) {
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
-            const xCoords = [150, 250]; // x=150, 250 の両方で条件を満たすYを探す
             const targetX = 435; // x=435 の最小Yのみを取得
-
-            let minCommonY = null;
             let minYForX435 = null;
             let rgbForX435 = null;
 
-            // 条件1: x=150, 250 の両方で条件を満たす最小Y
-            for (let y = 1650; y < newHeight; y++) {
-                let meetsCondition = true;
-                for (let x of xCoords) {
-                    if (x >= newWidth) {
-                        meetsCondition = false;
-                        break;
-                    }
-                    const index = (y * newWidth + x) * 4;
-                    const g = data[index + 1];
-                    const b = data[index + 2];
-
-                    if (!(g >= 200 && b <= 10)) {
-                        meetsCondition = false;
-                        break;
-                    }
-                }
-
-                if (meetsCondition) {
-                    minCommonY = y;
-                    break;
-                }
-            }
-
-            // 条件2: x=435 の最小Yを探す
+            // 条件: x=435 の最小Yを探す
             for (let y = 1300; y < newHeight; y++) {
                 if (targetX >= newWidth) continue;
 
@@ -137,20 +110,13 @@ function processImage(file, conversionTable, callback) {
                 }
             }
 
-            console.log("🔍 x=150,250 の最小Y:", minCommonY);
             console.log("🔍 x=435 の最小Y:", minYForX435, "RGB:", rgbForX435);
 
-            let resultHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
-            resultHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
-
-            if (minCommonY !== null && minYForX435 !== null) {
-                const diff = minCommonY - minYForX435;
-                const convertedDiff = conversionTable[diff] || "該当なし";
-
-                resultHTML += `<p>x=435 の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
-                resultHTML += `<p>x=435 の RGB: R:${rgbForX435.R}, G:${rgbForX435.G}, B:${rgbForX435.B}</p>`;
+            let resultHTML = "";
+            if (minYForX435 !== null) {
+                resultHTML = `<p>x=435 の最小Y: ${minYForX435}</p>`;
             } else {
-                resultHTML += `<p>x=435 の Y 差分: 計算不可</p>`;
+                resultHTML = `<p>x=435 の最小Y: 条件を満たすピクセルなし</p>`;
             }
 
             console.log("📊 結果のHTML:", resultHTML);
