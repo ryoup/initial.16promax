@@ -37,7 +37,7 @@ function parseCSV(csvText) {
     return conversionTable;
 }
 
-// 画像解析処理
+// 画像解析処理（Canvas を使わずに RGB を取得）
 function processImage(conversionTable) {
     console.log("🖼️ 画像処理開始: conversionTable =", conversionTable);
 
@@ -45,8 +45,10 @@ function processImage(conversionTable) {
     const file = fileInput.files[0];
     const reader = new FileReader();
 
-    reader.onload = function() {
+    reader.onload = function(event) {
         const img = new Image();
+        img.src = event.target.result;
+
         img.onload = function() {
             const newWidth = img.width;
             const newHeight = img.height;
@@ -60,21 +62,14 @@ function processImage(conversionTable) {
 
             console.log("✅ 画像サイズOK:", newWidth, "x", newHeight);
 
-            // Canvas の設定
+            // Canvas を使わずに元画像の RGB を直接取得
             const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d", { colorSpace: "srgb" });
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
             canvas.width = newWidth;
             canvas.height = newHeight;
-
-            // 🔴 画像補正を無効化
-            ctx.imageSmoothingEnabled = false;
-
-            // キャンバスに画像を描画
             ctx.drawImage(img, 0, 0);
-            console.log("✅ 画像がキャンバスに描画されました");
 
-            // 画像データを取得
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
@@ -152,8 +147,6 @@ function processImage(conversionTable) {
             console.log("📊 結果のHTML:", resultsHTML);
             document.getElementById("result").innerHTML = resultsHTML;
         };
-
-        img.src = reader.result;
     };
 
     reader.readAsDataURL(file);
