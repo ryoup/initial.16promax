@@ -67,8 +67,8 @@ function processImage(conversionTable) {
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
-            const xCoords = [150, 250];
-            const xTargets = [218, 435, 650, 867];
+            const xCoords = [150, 250]; // x=150, 250 の両方で条件を満たすYを探す
+            const xTargets = [218, 435, 650, 867]; // x=218, 435, 650, 867 の最小Yを探す
 
             let minCommonY = null;
             let minYForX = {};
@@ -77,7 +77,7 @@ function processImage(conversionTable) {
                 minYForX[x] = null;
             });
 
-            // 条件1の解析
+            // 条件1: x=150, 250 の両方で条件を満たす最小Y
             for (let y = 1650; y < newHeight; y++) {
                 let meetsCondition = true;
                 for (let x of xCoords) {
@@ -101,7 +101,7 @@ function processImage(conversionTable) {
                 }
             }
 
-            // 条件2の解析
+            // 条件2: x=218, 435, 650, 867 の最小Yを探す
             for (let y = 1300; y < newHeight; y++) {
                 for (let x of xTargets) {
                     if (x >= newWidth) continue;
@@ -119,7 +119,8 @@ function processImage(conversionTable) {
                 }
             }
 
-            console.log("🔍 各x座標の最小Y値:", minYForX);
+            console.log("🔍 x=150,250 の最小Y:", minCommonY);
+            console.log("🔍 各 x=218,435,650,867 の最小Y:", minYForX);
 
             let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
             resultsHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
@@ -128,13 +129,17 @@ function processImage(conversionTable) {
                 const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
                 console.log(`x=${x} の元のY値:`, yValue);
 
-                const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : null;
-                console.log(`x=${x} の Y 差分:`, diff);
+                if (minCommonY !== null && minYForX[x] !== null) {
+                    const diff = minCommonY - minYForX[x];
+                    console.log(`x=${x} の Y 差分:`, diff);
 
-                const convertedDiff = diff !== null ? conversionTable[diff] || "該当なし" : "計算不可";
-                console.log(`x=${x} の変換後の Y 差分:`, convertedDiff);
+                    const convertedDiff = conversionTable[diff] || "該当なし";
+                    console.log(`x=${x} の変換後の Y 差分:`, convertedDiff);
 
-                resultsHTML += `<p>x=${x} の Y 差分: ${diff === null ? "計算不可" : diff}（変換後: ${convertedDiff}）</p>`;
+                    resultsHTML += `<p>x=${x} の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
+                } else {
+                    resultsHTML += `<p>x=${x} の Y 差分: 計算不可</p>`;
+                }
             });
 
             console.log("📊 結果のHTML:", resultsHTML);
