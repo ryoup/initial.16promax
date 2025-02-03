@@ -72,9 +72,11 @@ function processImage(conversionTable) {
 
             let minCommonY = null;
             let minYForX = {};
+            let rgbForX = {}; // 各 x 座標の RGB 値を保存
 
             xTargets.forEach(x => {
                 minYForX[x] = null;
+                rgbForX[x] = null;
             });
 
             // 条件1: x=150, 250 の両方で条件を満たす最小Y
@@ -114,6 +116,7 @@ function processImage(conversionTable) {
                     if (r >= 200 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
                             minYForX[x] = y;
+                            rgbForX[x] = { R: r, G: g, B: b }; // RGB 値を保存
                         }
                     }
                 }
@@ -121,13 +124,15 @@ function processImage(conversionTable) {
 
             console.log("🔍 x=150,250 の最小Y:", minCommonY);
             console.log("🔍 各 x=218,435,650,867 の最小Y:", minYForX);
+            console.log("🎨 各 x=218,435,650,867 の RGB:", rgbForX);
 
             let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
             resultsHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
 
             xTargets.forEach(x => {
                 const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
-                console.log(`x=${x} の元のY値:`, yValue);
+                const rgbValue = rgbForX[x] ? `R:${rgbForX[x].R}, G:${rgbForX[x].G}, B:${rgbForX[x].B}` : "なし";
+                console.log(`x=${x} の元のY値:`, yValue, "RGB:", rgbValue);
 
                 if (minCommonY !== null && minYForX[x] !== null) {
                     const diff = minCommonY - minYForX[x];
@@ -137,6 +142,7 @@ function processImage(conversionTable) {
                     console.log(`x=${x} の変換後の Y 差分:`, convertedDiff);
 
                     resultsHTML += `<p>x=${x} の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
+                    resultsHTML += `<p>x=${x} の RGB: ${rgbValue}</p>`;
                 } else {
                     resultsHTML += `<p>x=${x} の Y 差分: 計算不可</p>`;
                 }
