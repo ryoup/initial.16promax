@@ -60,13 +60,21 @@ function processImage(conversionTable) {
 
             console.log("✅ 画像サイズOK:", newWidth, "x", newHeight);
 
+            // Canvas の設定
             const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d", { colorSpace: "srgb" });
 
             canvas.width = newWidth;
             canvas.height = newHeight;
-            ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
+            // 🔴 画像補正を無効化
+            ctx.imageSmoothingEnabled = false;
+
+            // キャンバスに画像を描画
+            ctx.drawImage(img, 0, 0);
+            console.log("✅ 画像がキャンバスに描画されました");
+
+            // 画像データを取得
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
@@ -137,18 +145,8 @@ function processImage(conversionTable) {
                 const rgbValue = rgbForX[x] ? `R:${rgbForX[x].R}, G:${rgbForX[x].G}, B:${rgbForX[x].B}` : "なし";
                 console.log(`x=${x} の元のY値:`, yValue, "RGB:", rgbValue);
 
-                if (minCommonY !== null && minYForX[x] !== null) {
-                    const diff = minCommonY - minYForX[x];
-                    console.log(`x=${x} の Y 差分:`, diff);
-
-                    const convertedDiff = conversionTable[diff] || "該当なし";
-                    console.log(`x=${x} の変換後の Y 差分:`, convertedDiff);
-
-                    resultsHTML += `<p>x=${x} の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
-                    resultsHTML += `<p>x=${x} の RGB: ${rgbValue}</p>`;
-                } else {
-                    resultsHTML += `<p>x=${x} の Y 差分: 計算不可</p>`;
-                }
+                resultsHTML += `<p>x=${x} の Y: ${yValue}</p>`;
+                resultsHTML += `<p>x=${x} の RGB: ${rgbValue}</p>`;
             });
 
             console.log("📊 結果のHTML:", resultsHTML);
