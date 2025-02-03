@@ -118,6 +118,7 @@ function processImage(conversionTable) {
                 const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : "計算不可";
                 resultsHTML += `<p>x=${x} の最小Y: ${yValue}（変換後: ${convertedY}）</p>`;
                 resultsHTML += `<p>Yの引き算 (minCommonY - minYForX[${x}]): ${diff}</p>`;
+                
             });
 
             document.getElementById("result").innerHTML = resultsHTML;
