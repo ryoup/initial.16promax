@@ -9,7 +9,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
         return;
     }
 
-    console.log(`📡 ${fileInput.files.length} 枚の画像を取得しました`);
+    console.log(`📡 画像を取得しました: ${fileInput.files[0].name}`);
 
     // データリスト（変換用）の取得
     fetch("https://ryoup.github.io/13xJKeuZFtK9269Zk8JZHT3V3y0tbz2EQkL6Hw9n9YC4zxp33QmkYN8zLtb2k2xSsA2DNQEvy0nW580arezuxdCme3hN1g03RXQT/data.csv?v=" + new Date().getTime())
@@ -19,8 +19,8 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             const conversionTable = parseCSV(csvText);
             console.log("🔍 変換リスト:", conversionTable);
 
-            // 全画像を順番に処理
-            processAllImages(fileInput.files, conversionTable);
+            // 画像を解析
+            processImage(fileInput.files[0], conversionTable);
         })
         .catch(error => {
             console.error("❌ データリストの読み込みエラー:", error);
@@ -33,38 +33,14 @@ function parseCSV(csvText) {
     const rows = csvText.trim().split("\n");
     let conversionTable = {};
     rows.forEach(row => {
-        const [originalDiff, convertedValue] = row.split(",").map(Number);
-        conversionTable[originalDiff] = convertedValue;
+        const [originalY, convertedValue] = row.split(",").map(Number);
+        conversionTable[originalY] = convertedValue;
     });
     return conversionTable;
 }
 
-// 全画像を処理する関数
-function processAllImages(files, conversionTable) {
-    let resultsHTML = `<h2>解析結果</h2>`;
-    let fileIndex = 0;
-
-    function processNextImage() {
-        if (fileIndex >= files.length) {
-            document.getElementById("result").innerHTML = resultsHTML;
-            return;
-        }
-
-        const file = files[fileIndex];
-        console.log(`🖼️ 画像解析開始 (${fileIndex + 1}/${files.length}): ${file.name}`);
-
-        processImage(file, conversionTable, (resultHTML) => {
-            resultsHTML += `<h3>画像: ${file.name}</h3>${resultHTML}`;
-            fileIndex++;
-            processNextImage(); // 次の画像を処理
-        });
-    }
-
-    processNextImage();
-}
-
 // 画像解析処理
-function processImage(file, conversionTable, callback) {
+function processImage(file, conversionTable) {
     const reader = new FileReader();
 
     reader.onload = function() {
@@ -73,10 +49,12 @@ function processImage(file, conversionTable, callback) {
             let newWidth = img.width;
             let newHeight = img.height;
 
-            if (newWidth !== 1080) {
-                const scaleFactor = 1080 / newWidth;
-                newWidth = 1080;
-                newHeight = Math.round(img.height * scaleFactor);
+            console.log(`📏 画像サイズ: ${newWidth}×${newHeight}`);
+
+            // 画像サイズが 1080x2400 でなければ警告を表示
+            if (newWidth !== 1080 || newHeight !== 2400) {
+                document.getElementById("result").innerHTML = `<p style="color: red;">⚠ 画像サイズが合っていません。</p>`;
+                return;
             }
 
             const canvas = document.createElement("canvas");
@@ -89,38 +67,65 @@ function processImage(file, conversionTable, callback) {
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
-            const targetX = 435; // x=435 の最小Yのみを取得
-            let minYForX435 = null;
-            let rgbForX435 = null;
+            const xTargets = [218, 435, 650, 867]; // 検出するX座標
+            let minYForX = {};
+            let convertedValues = {};
 
-            // 条件: x=435 の最小Yを探す
+            xTargets.forEach(x => {
+                minYForX[x] = null;
+                convertedValues[x] = "該当なし";
+            });
+
+            // 各X座標の最小Yを探索
             for (let y = 1300; y < newHeight; y++) {
-                if (targetX >= newWidth) continue;
+                for (let x of xTargets) {
+                    if (x >= newWidth) continue;
 
-                const index = (y * newWidth + targetX) * 4;
-                const r = data[index];
-                const g = data[index + 1];
-                const b = data[index + 2];
+                    const index = (y * newWidth + x) * 4;
+                    const r = data[index];
+                    const g = data[index + 1];
+                    const b = data[index + 2];
 
-                if (r >= 200 && g <= 100 && b <= 100) {
-                    if (minYForX435 === null) {
-                        minYForX435 = y;
-                        rgbForX435 = { R: r, G: g, B: b };
+                    if (r >= 200 && g <= 100 && b <= 100) {
+                        if (minYForX[x] === null) {
+                            minYForX[x] = y;
+                        }
                     }
                 }
             }
 
-            console.log("🔍 x=435 の最小Y:", minYForX435, "RGB:", rgbForX435);
+            console.log("🔍 各 x=218,435,650,867 の最小Y:", minYForX);
 
-            let resultHTML = "";
-            if (minYForX435 !== null) {
-                resultHTML = `<p>x=435 の最小Y: ${minYForX435}</p>`;
-            } else {
-                resultHTML = `<p>x=435 の最小Y: 条件を満たすピクセルなし</p>`;
+            // データリストで変換
+            xTargets.forEach(x => {
+                if (minYForX[x] !== null) {
+                    convertedValues[x] = conversionTable[minYForX[x]] || "該当なし";
+                }
+            });
+
+            console.log("🔍 変換後の値:", convertedValues);
+
+            // x=150, y=1751 の RGB 値を取得
+            let rgb150_1751 = "取得不可";
+            if (150 < newWidth && 1751 < newHeight) {
+                const index = (1751 * newWidth + 150) * 4;
+                const r = data[index];
+                const g = data[index + 1];
+                const b = data[index + 2];
+                rgb150_1751 = `R:${r}, G:${g}, B:${b}`;
             }
 
-            console.log("📊 結果のHTML:", resultHTML);
-            callback(resultHTML);
+            console.log("🎨 x=150, y=1751 のRGB:", rgb150_1751);
+
+            let resultsHTML = `<h2>解析結果</h2>`;
+            xTargets.forEach(x => {
+                resultsHTML += `<p>x=${x} の最小Y: ${minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x]}（変換後: ${convertedValues[x]}）</p>`;
+            });
+
+            resultsHTML += `<p>x=150, y=1751 の RGB: ${rgb150_1751}</p>`;
+
+            console.log("📊 結果のHTML:", resultsHTML);
+            document.getElementById("result").innerHTML = resultsHTML;
         };
 
         img.src = reader.result;
