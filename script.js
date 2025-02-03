@@ -13,10 +13,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
 
     // データリスト（変換用）の取得
     fetch("https://ryoup.github.io/13xJKeuZFtK9269Zk8JZHT3V3y0tbz2EQkL6Hw9n9YC4zxp33QmkYN8zLtb2k2xSsA2DNQEvy0nW580arezuxdCme3hN1g03RXQT/data.csv?v=" + new Date().getTime())
-        .then(response => {
-            console.log("✅ データリストのレスポンス:", response);
-            return response.text();
-        })
+        .then(response => response.text())
         .then(csvText => {
             console.log("📜 取得した CSV データ:", csvText);
             const conversionTable = parseCSV(csvText);
@@ -34,8 +31,8 @@ function parseCSV(csvText) {
     const rows = csvText.trim().split("\n");
     let conversionTable = {};
     rows.forEach(row => {
-        const [originalY, convertedValue] = row.split(",").map(Number);
-        conversionTable[originalY] = convertedValue;
+        const [originalDiff, convertedValue] = row.split(",").map(Number);
+        conversionTable[originalDiff] = convertedValue;
     });
     return conversionTable;
 }
@@ -122,7 +119,6 @@ function processImage(conversionTable) {
                 }
             }
 
-            // デバッグ: minYForX の内容を表示
             console.log("🔍 各x座標の最小Y値:", minYForX);
 
             let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
@@ -132,12 +128,13 @@ function processImage(conversionTable) {
                 const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
                 console.log(`x=${x} の元のY値:`, yValue);
 
-                const convertedY = conversionTable[minYForX[x]] || "該当なし";
-                console.log(`x=${x} の変換後のY値:`, convertedY);
+                const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : null;
+                console.log(`x=${x} の Y 差分:`, diff);
 
-                const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : "計算不可";
-                resultsHTML += `<p>x=${x} の最小Y: ${yValue}（変換後: ${convertedY}）</p>`;
-                resultsHTML += `<p>Yの引き算 (minCommonY - minYForX[${x}]): ${diff}</p>`;
+                const convertedDiff = diff !== null ? conversionTable[diff] || "該当なし" : "計算不可";
+                console.log(`x=${x} の変換後の Y 差分:`, convertedDiff);
+
+                resultsHTML += `<p>x=${x} の Y 差分: ${diff === null ? "計算不可" : diff}（変換後: ${convertedDiff}）</p>`;
             });
 
             console.log("📊 結果のHTML:", resultsHTML);
