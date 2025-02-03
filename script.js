@@ -48,14 +48,17 @@ function processImage(conversionTable) {
     reader.onload = function() {
         const img = new Image();
         img.onload = function() {
-            let newWidth = img.width;
-            let newHeight = img.height;
+            const newWidth = img.width;
+            const newHeight = img.height;
 
-            if (newWidth !== 1080) {
-                const scaleFactor = 1080 / newWidth;
-                newWidth = 1080;
-                newHeight = Math.round(img.height * scaleFactor);
+            // 🔴 画像サイズチェック（1080x2400 以外ならエラー）
+            if (newWidth !== 1080 || newHeight !== 2400) {
+                alert(`❌ 画像サイズが正しくありません！ 1080x2400 の画像を使用してください。\n現在の画像サイズ: ${newWidth}x${newHeight}`);
+                console.error(`❌ エラー: 画像サイズが ${newWidth}x${newHeight} です。 1080x2400 の画像を使用してください。`);
+                return;
             }
+
+            console.log("✅ 画像サイズOK:", newWidth, "x", newHeight);
 
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
@@ -126,7 +129,7 @@ function processImage(conversionTable) {
             console.log("🔍 各 x=218,435,650,867 の最小Y:", minYForX);
             console.log("🎨 各 x=218,435,650,867 の RGB:", rgbForX);
 
-            let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
+            let resultsHTML = `<p>画像サイズ: ${newWidth}x${newHeight}（OK）</p>`;
             resultsHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
 
             xTargets.forEach(x => {
