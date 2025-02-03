@@ -1,22 +1,30 @@
 document.getElementById("uploadForm").addEventListener("submit", function(e) {
     e.preventDefault(); // ページリロードを防止
 
+    console.log("✅ script.js が正常に読み込まれました");
+
     const fileInput = document.getElementById("fileInput");
     if (fileInput.files.length === 0) {
         alert("画像を選択してください！");
         return;
     }
 
+    console.log("📡 データリストを取得開始");
+
     // データリスト（変換用）の取得
     fetch("https://ryoup.github.io/13xJKeuZFtK9269Zk8JZHT3V3y0tbz2EQkL6Hw9n9YC4zxp33QmkYN8zLtb2k2xSsA2DNQEvy0nW580arezuxdCme3hN1g03RXQT/data.csv?v=" + new Date().getTime())
-        .then(response => response.text())
+        .then(response => {
+            console.log("✅ データリストのレスポンス:", response);
+            return response.text();
+        })
         .then(csvText => {
+            console.log("📜 取得した CSV データ:", csvText);
             const conversionTable = parseCSV(csvText);
-            console.log("🔍 データリストの内容:", conversionTable); // デバッグ用
+            console.log("🔍 変換リスト:", conversionTable);
             processImage(conversionTable); // 画像解析と変換処理を実行
         })
         .catch(error => {
-            console.error("データリストの読み込みエラー:", error);
+            console.error("❌ データリストの読み込みエラー:", error);
             alert("データリストの読み込みに失敗しました");
         });
 });
@@ -34,6 +42,8 @@ function parseCSV(csvText) {
 
 // 画像解析処理
 function processImage(conversionTable) {
+    console.log("🖼️ 画像処理開始: conversionTable =", conversionTable);
+
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
     const reader = new FileReader();
@@ -112,7 +122,7 @@ function processImage(conversionTable) {
                 }
             }
 
-            // デバッグ: minYForXの内容を表示
+            // デバッグ: minYForX の内容を表示
             console.log("🔍 各x座標の最小Y値:", minYForX);
 
             let resultsHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
@@ -120,16 +130,17 @@ function processImage(conversionTable) {
 
             xTargets.forEach(x => {
                 const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
-                console.log(`x=${x} の元のY値:`, yValue); // デバッグ用
+                console.log(`x=${x} の元のY値:`, yValue);
 
                 const convertedY = conversionTable[minYForX[x]] || "該当なし";
-                console.log(`x=${x} の変換後のY値:`, convertedY); // デバッグ用
+                console.log(`x=${x} の変換後のY値:`, convertedY);
 
                 const diff = (minCommonY !== null && minYForX[x] !== null) ? (minCommonY - minYForX[x]) : "計算不可";
                 resultsHTML += `<p>x=${x} の最小Y: ${yValue}（変換後: ${convertedY}）</p>`;
                 resultsHTML += `<p>Yの引き算 (minCommonY - minYForX[${x}]): ${diff}</p>`;
             });
 
+            console.log("📊 結果のHTML:", resultsHTML);
             document.getElementById("result").innerHTML = resultsHTML;
         };
 
