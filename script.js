@@ -89,17 +89,12 @@ function processImage(file, conversionTable, callback) {
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const data = imageData.data;
 
-            const xCoords = [150, 250];
-            const xTargets = [218, 435, 650, 867];
+            const xCoords = [150, 250]; // x=150, 250 の両方で条件を満たすYを探す
+            const targetX = 435; // x=435 の最小Yのみを取得
 
             let minCommonY = null;
-            let minYForX = {};
-            let rgbForX = {}; 
-
-            xTargets.forEach(x => {
-                minYForX[x] = null;
-                rgbForX[x] = null;
-            });
+            let minYForX435 = null;
+            let rgbForX435 = null;
 
             // 条件1: x=150, 250 の両方で条件を満たす最小Y
             for (let y = 1650; y < newHeight; y++) {
@@ -125,46 +120,38 @@ function processImage(file, conversionTable, callback) {
                 }
             }
 
-            // 条件2: x=218, 435, 650, 867 の最小Yを探す
+            // 条件2: x=435 の最小Yを探す
             for (let y = 1300; y < newHeight; y++) {
-                for (let x of xTargets) {
-                    if (x >= newWidth) continue;
+                if (targetX >= newWidth) continue;
 
-                    const index = (y * newWidth + x) * 4;
-                    const r = data[index];
-                    const g = data[index + 1];
-                    const b = data[index + 2];
+                const index = (y * newWidth + targetX) * 4;
+                const r = data[index];
+                const g = data[index + 1];
+                const b = data[index + 2];
 
-                    if (r >= 200 && g <= 100 && b <= 100) {
-                        if (minYForX[x] === null) {
-                            minYForX[x] = y;
-                            rgbForX[x] = { R: r, G: g, B: b };
-                        }
+                if (r >= 200 && g <= 100 && b <= 100) {
+                    if (minYForX435 === null) {
+                        minYForX435 = y;
+                        rgbForX435 = { R: r, G: g, B: b };
                     }
                 }
             }
 
             console.log("🔍 x=150,250 の最小Y:", minCommonY);
-            console.log("🔍 各 x=218,435,650,867 の最小Y:", minYForX);
-            console.log("🎨 各 x=218,435,650,867 の RGB:", rgbForX);
+            console.log("🔍 x=435 の最小Y:", minYForX435, "RGB:", rgbForX435);
 
             let resultHTML = `<p>画像リサイズ後のサイズ: ${newWidth}x${newHeight}</p>`;
             resultHTML += `<p>x=150, x=250 の両方で条件を満たす最小Y: ${minCommonY === null ? "条件を満たすピクセルなし" : minCommonY}</p>`;
 
-            xTargets.forEach(x => {
-                const yValue = minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x];
-                const rgbValue = rgbForX[x] ? `R:${rgbForX[x].R}, G:${rgbForX[x].G}, B:${rgbForX[x].B}` : "なし";
+            if (minCommonY !== null && minYForX435 !== null) {
+                const diff = minCommonY - minYForX435;
+                const convertedDiff = conversionTable[diff] || "該当なし";
 
-                if (minCommonY !== null && minYForX[x] !== null) {
-                    const diff = minCommonY - minYForX[x];
-                    const convertedDiff = conversionTable[diff] || "該当なし";
-
-                    resultHTML += `<p>x=${x} の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
-                    resultHTML += `<p>x=${x} の RGB: ${rgbValue}</p>`;
-                } else {
-                    resultHTML += `<p>x=${x} の Y 差分: 計算不可</p>`;
-                }
-            });
+                resultHTML += `<p>x=435 の Y 差分: ${diff}（変換後: ${convertedDiff}）</p>`;
+                resultHTML += `<p>x=435 の RGB: R:${rgbForX435.R}, G:${rgbForX435.G}, B:${rgbForX435.B}</p>`;
+            } else {
+                resultHTML += `<p>x=435 の Y 差分: 計算不可</p>`;
+            }
 
             console.log("📊 結果のHTML:", resultHTML);
             callback(resultHTML);
