@@ -19,7 +19,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
             const conversionTable = parseCSV(csvText);
             console.log("🔍 変換リスト:", conversionTable);
 
-            // 1枚の画像を解析
+            // 画像を解析
             processImage(fileInput.files[0], conversionTable);
         })
         .catch(error => {
@@ -49,10 +49,12 @@ function processImage(file, conversionTable) {
             let newWidth = img.width;
             let newHeight = img.height;
 
-            if (newWidth !== 1080) {
-                const scaleFactor = 1080 / newWidth;
-                newWidth = 1080;
-                newHeight = Math.round(img.height * scaleFactor);
+            console.log(`📏 画像サイズ: ${newWidth}×${newHeight}`);
+
+            // 画像サイズが 1080x2400 でなければ警告を表示
+            if (newWidth !== 1080 || newHeight !== 2400) {
+                document.getElementById("result").innerHTML = `<p style="color: red;">⚠ 画像サイズが合っていません。</p>`;
+                return;
             }
 
             const canvas = document.createElement("canvas");
@@ -103,10 +105,24 @@ function processImage(file, conversionTable) {
 
             console.log("🔍 変換後の値:", convertedValues);
 
+            // x=150, y=1751 の RGB 値を取得
+            let rgb150_1751 = "取得不可";
+            if (150 < newWidth && 1751 < newHeight) {
+                const index = (1751 * newWidth + 150) * 4;
+                const r = data[index];
+                const g = data[index + 1];
+                const b = data[index + 2];
+                rgb150_1751 = `R:${r}, G:${g}, B:${b}`;
+            }
+
+            console.log("🎨 x=150, y=1751 のRGB:", rgb150_1751);
+
             let resultsHTML = `<h2>解析結果</h2>`;
             xTargets.forEach(x => {
                 resultsHTML += `<p>x=${x} の最小Y: ${minYForX[x] === null ? "条件を満たすピクセルなし" : minYForX[x]}（変換後: ${convertedValues[x]}）</p>`;
             });
+
+            resultsHTML += `<p>x=150, y=1751 の RGB: ${rgb150_1751}</p>`;
 
             console.log("📊 結果のHTML:", resultsHTML);
             document.getElementById("result").innerHTML = resultsHTML;
