@@ -7,17 +7,12 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
         return;
     }
 
-    const file = fileInput.files[0];
-
-    // 画像を画面に表示
-    displayUploadedImage(file);
-
     // データリスト（変換用）の取得
     fetch("https://ryoup.github.io/13xJKeuZFtK9269Zk8JZHT3V3y0tbz2EQkL6Hw9n9YC4zxp33QmkYN8zLtb2k2xSsA2DNQEvy0nW580arezuxdCme3hN1g03RXQT/data.csv?v=" + new Date().getTime())
         .then(response => response.text())
         .then(csvText => {
             const conversionTable = parseCSV(csvText);
-            processImage(file, conversionTable); // 画像解析を直接実行
+            processImage(fileInput.files[0], conversionTable); // 画像解析を直接実行
         })
         .catch(error => {
             document.getElementById("result").innerHTML = `<p style="color: red;">データリストの読み込みに失敗しました。</p>`;
@@ -33,22 +28,6 @@ function parseCSV(csvText) {
         conversionTable[originalY] = convertedValue;
     });
     return conversionTable;
-}
-
-// アップロードした画像を表示
-function displayUploadedImage(file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const uploadedImage = document.getElementById("uploadedImage");
-        const downloadLink = document.getElementById("downloadLink");
-
-        uploadedImage.src = event.target.result;
-        uploadedImage.style.display = "block"; // 画像を表示
-
-        downloadLink.href = event.target.result;
-        downloadLink.style.display = "block"; // ダウンロードボタンを表示
-    };
-    reader.readAsDataURL(file);
 }
 
 // 画像解析処理
@@ -93,7 +72,7 @@ function processImage(file, conversionTable) {
                     const g = data[index + 1];
                     const b = data[index + 2];
 
-                    if (r >= 200 && g <= 100 && b <= 100) {
+                    if (r >= 220 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
                             minYForX[x] = y;
                         }

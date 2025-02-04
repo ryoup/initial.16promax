@@ -37,8 +37,3 @@ button {
 button:hover {
     background-color: #0056b3;
 }
-
-/* 画像の表示エリア */
-#imageContainer {
-    margin-top: 20px;
-}
