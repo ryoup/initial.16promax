@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel6限定</title>
+    <title>チェッカー</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>判定用サイト（Pixel6）</h1>
+    <h1>画像アップロードサイト</h1>
     <form id="uploadForm">
         <label for="fileInput">画像を選択:</label>
         <input type="file" id="fileInput" accept="image/*">
         <button type="submit">解析開始</button>
     </form>
+    <div id="imageContainer">
+        <h2>アップロードした画像</h2>
+        <img id="uploadedImage" style="display: none; max-width: 100%; height: auto;" />
+        <a id="downloadLink" style="display: none;" download="uploaded_image.png">
+            <button>画像をダウンロード</button>
+        </a>
+    </div>
     <div id="result"></div>
     <script src="script.js"></script>
 </body>
