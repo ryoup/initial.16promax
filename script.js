@@ -83,6 +83,7 @@ function processImage(file, conversionTable) {
             // データリストで変換
             xTargets.forEach(x => {
                 if (minYForX[x] !== null) {
+                    console.log(`🔍 x=${x} の最小Y: ${minYForX[x]}`); // 変換前のYをコンソールに出力
                     convertedValues[x] = conversionTable[minYForX[x]] || "該当なし";
                 }
             });
