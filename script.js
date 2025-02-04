@@ -114,7 +114,7 @@ function processImage(file, conversionTable) {
                     const g = data[index + 1];
                     const b = data[index + 2];
 
-                    if (r >= 200 && g <= 100 && b <= 100) {
+                    if (r >= 220 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
                             minYForX[x] = y;
                         }
