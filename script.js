@@ -12,7 +12,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
         .then(response => response.text())
         .then(csvText => {
             const conversionTable = parseCSV(csvText);
-            processImage(fileInput.files[0], conversionTable); // 画像解析を直接実行
+            processImage(fileInput.files[0], conversionTable);
         })
         .catch(error => {
             document.getElementById("result").innerHTML = `<p style="color: red;">データリストの読み込みに失敗しました。</p>`;
@@ -72,7 +72,7 @@ function processImage(file, conversionTable) {
                     const g = data[index + 1];
                     const b = data[index + 2];
 
-                    if (r >= 220 && g <= 100 && b <= 100) {
+                    if (r >= 200 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
                             minYForX[x] = y;
                         }
@@ -80,20 +80,36 @@ function processImage(file, conversionTable) {
                 }
             }
 
-            // データリストで変換
+            // データリストで変換（該当なしの場合の処理を追加）
             xTargets.forEach(x => {
-                if (minYForX[x] !== null) {
-                    console.log(`🔍 x=${x} の最小Y: ${minYForX[x]}`); // 変換前のYをコンソールに出力
-                    convertedValues[x] = conversionTable[minYForX[x]] || "該当なし";
+                let y = minYForX[x];
+                if (y !== null) {
+                    convertedValues[x] = conversionTable[y] || "該当なし";
+                }
+
+                // 該当なしなら Y の補正を試みる（ループはしない）
+                if (convertedValues[x] === "該当なし" && y !== null) {
+                    const indexMinus1 = ((y - 1) * img.width + x) * 4;
+                    const rMinus1 = data[indexMinus1];
+                    const gMinus1 = data[indexMinus1 + 1];
+                    const bMinus1 = data[indexMinus1 + 2];
+
+                    if (rMinus1 >= 220 && gMinus1 <= 115 && bMinus1 <= 115) {
+                        y = y - 1; // Y を -1 にする
+                    } else {
+                        y = y + 1; // そうでなければ Y を +1 にする
+                    }
+
+                    convertedValues[x] = conversionTable[y] || "該当なし";
                 }
             });
 
             // 出力は "1P: 数値", "2P: 数値", "3P: 数値", "4P: 数値"
             let resultsHTML = `<h2>解析結果</h2>`;
-            resultsHTML += `<p>1P: ${convertedValues[218]}</p>`;
-            resultsHTML += `<p>2P: ${convertedValues[435]}</p>`;
-            resultsHTML += `<p>3P: ${convertedValues[650]}</p>`;
-            resultsHTML += `<p>4P: ${convertedValues[867]}</p>`;
+            resultsHTML += `<p>1P : ${convertedValues[218]}</p>`;
+            resultsHTML += `<p>2P : ${convertedValues[435]}</p>`;
+            resultsHTML += `<p>3P : ${convertedValues[650]}</p>`;
+            resultsHTML += `<p>4P : ${convertedValues[867]}</p>`;
 
             document.getElementById("result").innerHTML = resultsHTML;
         };
