@@ -74,7 +74,23 @@ function processImage(file, conversionTable) {
 
                     if (r >= 220 && g <= 100 && b <= 100) {
                         if (minYForX[x] === null) {
-                            minYForX[x] = y;
+                            let validY = y;
+                            let isValid = true;
+
+                            for (let checkY = y; checkY <= y + 20 && checkY < img.height; checkY++) {
+                                const checkIndex = (checkY * img.width + x) * 4;
+                                const checkG = data[checkIndex + 1];
+                                const checkB = data[checkIndex + 2];
+
+                                if (checkG > 100 || checkB > 100) {
+                                    isValid = false;
+                                    break;
+                                }
+                            }
+
+                            if (isValid) {
+                                minYForX[x] = y;
+                            }
                         }
                     }
                 }
