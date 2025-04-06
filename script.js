@@ -122,10 +122,10 @@ function processImage(file, conversionTable) {
 
             // 出力は "1P: 数値", "2P: 数値", "3P: 数値", "4P: 数値"
             let resultsHTML = `<h2>解析結果</h2>`;
-            resultsHTML += `<p>1P : ${convertedValues[218]}</p>`;
-            resultsHTML += `<p>2P : ${convertedValues[435]}</p>`;
-            resultsHTML += `<p>3P : ${convertedValues[650]}</p>`;
-            resultsHTML += `<p>4P : ${convertedValues[867]}</p>`;
+            resultsHTML += `<p>1P : ${convertedValues[266]}</p>`;
+            resultsHTML += `<p>2P : ${convertedValues[531]}</p>`;
+            resultsHTML += `<p>3P : ${convertedValues[795]}</p>`;
+            resultsHTML += `<p>4P : ${convertedValues[1060]}</p>`;
 
             document.getElementById("result").innerHTML = resultsHTML;
         };
