@@ -38,7 +38,7 @@ function processImage(file, conversionTable) {
         const img = new Image();
         img.onload = function() {
             // 画像サイズチェック
-            if (img.width !== 1080 || img.height !== 2400) {
+            if (img.width !== 1320 || img.height !== 2868) {
                 document.getElementById("result").innerHTML = `<p style="color: red;">画像サイズが合っていません。</p>`;
                 return;
             }
@@ -53,7 +53,7 @@ function processImage(file, conversionTable) {
             const imageData = ctx.getImageData(0, 0, img.width, img.height);
             const data = imageData.data;
 
-            const xTargets = [218, 435, 650, 867]; // 検出するX座標
+            const xTargets = [266, 531, 795, 1060]; // 検出するX座標
             let minYForX = {};
             let convertedValues = {};
 
@@ -63,7 +63,7 @@ function processImage(file, conversionTable) {
             });
 
             // 各X座標の最小Yを探索
-            for (let y = 1300; y < img.height; y++) {
+            for (let y = 1600; y < img.height; y++) {
                 for (let x of xTargets) {
                     if (x >= img.width) continue;
 
