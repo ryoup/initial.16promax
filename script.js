@@ -8,7 +8,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(e) {
     }
 
     // データリスト（変換用）の取得
-    fetch("https://ryoup.github.io/13xJKeuZFtK9269Zk8JZHT3V3y0tbz2EQkL6Hw9n9YC4zxp33QmkYN8zLtb2k2xSsA2DNQEvy0nW580arezuxdCme3hN1g03RXQT/data.csv?v=" + new Date().getTime())
+    fetch("https://ryoup.github.io/initial.16promax/data.csv?v=" + new Date().getTime())
         .then(response => response.text())
         .then(csvText => {
             const conversionTable = parseCSV(csvText);
